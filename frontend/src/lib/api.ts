@@ -7,7 +7,12 @@
 import type { APIResponse } from '@/types';
 import { auth } from './firebase';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+// Strip trailing slashes to prevent double-slash URLs like //dashboard
+// when NEXT_PUBLIC_API_URL is set to e.g. "https://api.example.com/api/"
+const API_BASE = (
+  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
+).replace(/\/+$/, '');
+
 
 // ─── Auth Helpers ────────────────────────────
 

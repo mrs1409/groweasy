@@ -39,12 +39,31 @@ export function createApp(): express.Application {
   app.use(compression());
 
   // ─── CORS ────────────────────────────────────
+  const allowedOrigins = Array.isArray(config.corsOrigin)
+    ? config.corsOrigin
+    : [config.corsOrigin];
+
   app.use(cors({
-    origin: config.corsOrigin,
-    methods: ['GET', 'POST', 'DELETE'],
+    origin: (origin, callback) => {
+      // Allow server-to-server requests (no origin header) and health checks
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      logger.warn('CORS blocked request from unauthorized origin', { origin, allowedOrigins });
+      return callback(new Error(`CORS: origin '${origin}' is not allowed.`), false);
+    },
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Progress-ID', 'x-progress-id'],
-    maxAge: 86400, // 24 hours — reduce preflight requests
+    credentials: true,
+    maxAge: 86400, // 24 hours — reduces preflight frequency
   }));
+
+  // Explicitly handle OPTIONS preflight for all routes
+  app.options('*', cors());
+
 
   // ─── Body Parsers ───────────────────────────
   app.use(express.json({ limit: '1mb' }));

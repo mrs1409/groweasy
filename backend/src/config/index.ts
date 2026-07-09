@@ -26,8 +26,8 @@ export interface AppConfig {
   port: number;
   nodeEnv: 'development' | 'production' | 'test';
 
-  // CORS
-  corsOrigin: string;
+  // CORS — supports a single URL or comma-separated list of URLs
+  corsOrigin: string | string[];
 
   // AI
   aiProvider: 'gemini' | 'openai';
@@ -66,6 +66,21 @@ function parseIntEnv(key: string, defaultValue: number): number {
 
 
 /**
+ * Parse CORS_ORIGIN environment variable.
+ * - Strips trailing slashes (fixes Render/Vercel copy-paste mistakes)
+ * - Supports comma-separated list: "https://a.com,https://b.com"
+ * - Returns a string for single origin, string[] for multiple
+ */
+function parseCorsOrigins(raw: string): string | string[] {
+  const origins = raw
+    .split(',')
+    .map((o) => o.trim().replace(/\/+$/, '')) // strip trailing slashes
+    .filter(Boolean);
+
+  return origins.length === 1 ? origins[0] : origins;
+}
+
+/**
  * Build and validate the application configuration.
  * Called once at startup.
  */
@@ -78,8 +93,8 @@ function buildConfig(): AppConfig {
     port: parseIntEnv('PORT', 3001),
     nodeEnv,
 
-    // CORS
-    corsOrigin: process.env['CORS_ORIGIN'] || 'http://localhost:3000',
+    // CORS — strip trailing slashes, support comma-separated list
+    corsOrigin: parseCorsOrigins(process.env['CORS_ORIGIN'] || 'http://localhost:3000'),
 
     // AI
     aiProvider: (process.env.AI_PROVIDER || 'gemini').toLowerCase() === 'openai' ? 'openai' : 'gemini',
