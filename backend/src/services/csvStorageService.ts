@@ -8,7 +8,15 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { logger } from '../utils/logger';
 
-const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
+import * as os from 'os';
+
+// Render (and most PaaS) only allow writes to /tmp — /app is read-only.
+// Use UPLOADS_DIR env var to override, otherwise auto-detect.
+const UPLOADS_DIR = process.env['UPLOADS_DIR'] ||
+  (process.env['NODE_ENV'] === 'production'
+    ? path.join(os.tmpdir(), 'groweasy-uploads')   // /tmp/groweasy-uploads on Render
+    : path.join(process.cwd(), 'uploads'));          // ./uploads in local dev
+
 
 function ensureDir(dirPath: string): void {
   if (!fs.existsSync(dirPath)) {
