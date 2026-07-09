@@ -107,15 +107,12 @@ export function errorHandler(
     stack: err.stack,
   });
 
-  const response: APIErrorResponse = {
+  res.status(500).json({
     success: false,
     error: {
       code: ERROR_CODES.INTERNAL_ERROR,
-      message: 'An unexpected error occurred. Please try again.',
-      // Only include details in development
-      details: process.env['NODE_ENV'] !== 'production' ? err.message : undefined,
+      message: err.message,            // always expose in all envs — remove after diagnosis
+      details: err.stack?.split('\n').slice(0, 5).join(' | '), // first 5 stack lines
     },
-  };
-
-  res.status(500).json(response);
+  });
 }
