@@ -22,7 +22,11 @@ function initFirebaseAdmin(): App | undefined { // eslint-disable-line consisten
 
     if (projectId && clientEmail && privateKey) {
       logger.info('Initializing Firebase Admin using individual environment variables');
-      const formattedPrivateKey = privateKey.replace(/\\n/g, '\n');
+      const formattedPrivateKey = privateKey
+        .replace(/\\n/g, '\n')
+        .replace(/\r\n/g, '\n')
+        .replace(/\r/g, '\n');
+
       return initializeApp({
         credential: cert({
           projectId,
@@ -36,7 +40,9 @@ function initFirebaseAdmin(): App | undefined { // eslint-disable-line consisten
     logger.warn('Firebase credentials not explicitly found. Initializing with default credentials.');
     return initializeApp();
   } catch (error) {
-    logger.error('Failed to initialize Firebase Admin SDK', { error });
+    const errMsg = error instanceof Error ? error.message : String(error);
+    const errStack = error instanceof Error ? error.stack : undefined;
+    logger.error('Failed to initialize Firebase Admin SDK', { error: errMsg, stack: errStack });
     return undefined;
   }
 }
