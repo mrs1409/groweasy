@@ -10,7 +10,7 @@ generator client {
 datasource db {
   // Development: SQLite (file-based, no server needed)
   // Production: Change provider to "postgresql" and update DATABASE_URL
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
