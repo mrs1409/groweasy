@@ -7,7 +7,7 @@ import type { User } from '@prisma/client';
 
 interface UpsertUserData {
   firebaseUid: string;
-  email: string;
+  email: string | null;
   name?: string | null;
   photoUrl?: string | null;
 }

@@ -21,7 +21,7 @@ datasource db {
 model User {
   id          Int      @id @default(autoincrement())
   firebaseUid String   @unique @map("firebase_uid")
-  email       String   @unique
+  email       String?  @unique  // nullable: phone-auth users may have no email
   name        String?
   photoUrl    String?  @map("photo_url")
   createdAt   DateTime @default(now()) @map("created_at")

@@ -28,7 +28,7 @@ export class AuthService {
     try {
       const user = await userRepository.upsert({
         firebaseUid: claims.uid,
-        email: claims.email ?? '',
+        email: claims.email ?? null,   // null for phone-auth users (no email)
         name: claims.name ?? null,
         photoUrl: claims.picture ?? null,
       });
