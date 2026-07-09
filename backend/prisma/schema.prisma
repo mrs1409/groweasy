@@ -1,0 +1,100 @@
+// ============================================
+// GrowEasy — Prisma Schema
+// SQLite (dev) / PostgreSQL (prod)
+// ============================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  // Development: SQLite (file-based, no server needed)
+  // Production: Change provider to "postgresql" and update DATABASE_URL
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─── User ────────────────────────────────────
+// Stores authenticated users via Firebase UID.
+// One user → many imports → many leads.
+
+model User {
+  id          Int      @id @default(autoincrement())
+  firebaseUid String   @unique @map("firebase_uid")
+  email       String   @unique
+  name        String?
+  photoUrl    String?  @map("photo_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  imports     Import[]
+  leads       Lead[]
+
+  @@map("users")
+}
+
+// ─── Import ───────────────────────────────────
+// Represents one CSV upload session.
+// Soft-deleted via deletedAt — never hard-deleted.
+
+model Import {
+  id           Int       @id @default(autoincrement())
+  userId       Int       @map("user_id")
+  fileName     String    @map("file_name")
+  filePath     String?   @map("file_path")   // stored CSV for retry/download
+  status       String    @default("PROCESSING") // PROCESSING | COMPLETED | FAILED
+  totalRows    Int       @default(0) @map("total_rows")
+  importedRows Int       @default(0) @map("imported_rows")
+  skippedRows  Int       @default(0) @map("skipped_rows")
+  durationMs   Int?      @map("duration_ms")
+  errorMessage String?   @map("error_message")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")   // soft delete
+
+  user         User      @relation(fields: [userId], references: [id])
+  leads        Lead[]
+
+  @@index([userId])
+  @@index([userId, deletedAt])
+  @@map("imports")
+}
+
+// ─── Lead ─────────────────────────────────────
+// One extracted CRM record from an import.
+// All 15 assignment CRM fields stored as nullable strings.
+
+model Lead {
+  id                       Int      @id @default(autoincrement())
+  userId                   Int      @map("user_id")
+  importId                 Int      @map("import_id")
+
+  // 15 CRM fields per assignment specification (L107–L136)
+  leadCreatedAt            String?  @map("lead_created_at")
+  name                     String?
+  email                    String?
+  countryCode              String?  @map("country_code")
+  mobileWithoutCountryCode String?  @map("mobile_without_country_code")
+  company                  String?
+  city                     String?
+  state                    String?
+  country                  String?
+  leadOwner                String?  @map("lead_owner")
+  crmStatus                String?  @map("crm_status")
+  crmNote                  String?  @map("crm_note")
+  dataSource               String?  @map("data_source")
+  possessionTime           String?  @map("possession_time")
+  description              String?
+
+  createdAt                DateTime @default(now()) @map("created_at")
+  updatedAt                DateTime @updatedAt @map("updated_at")
+
+  user                     User     @relation(fields: [userId], references: [id])
+  import                   Import   @relation(fields: [importId], references: [id])
+
+  @@index([userId])
+  @@index([importId])
+  @@index([email])
+  @@index([crmStatus])
+  @@map("leads")
+}

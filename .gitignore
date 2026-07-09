@@ -1,0 +1,31 @@
+# Dependency directories
+node_modules/
+
+# Local env files
+.env
+.env.local
+.env.*.local
+
+# Database files
+*.db
+*.db-journal
+backend/prisma/dev.db
+backend/prisma/dev.db-journal
+
+# Local test outputs and temporary files
+frontend/e2e_screenshots/
+/invalid_leads.csv
+/messy_leads.csv
+
+# Next.js and build directories
+.next/
+dist/
+out/
+
+# Log files
+*.log
+npm-debug.log*
+
+# System files
+.DS_Store
+Thumbs.db
