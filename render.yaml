@@ -1,0 +1,24 @@
+# ============================================
+# Render Deployment Configuration
+# ============================================
+# Docs: https://render.com/docs/yaml-spec
+
+services:
+  - type: web
+    name: groweasy-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:production
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      # Set these in Render dashboard (do not commit secrets):
+      # DATABASE_URL        — PostgreSQL connection string from Render DB
+      # CORS_ORIGIN         — https://groweasy-zeta.vercel.app
+      # GEMINI_API_KEY      — your Gemini API key
+      # FIREBASE_PROJECT_ID — your Firebase project ID
+      # FIREBASE_CLIENT_EMAIL
+      # FIREBASE_PRIVATE_KEY
