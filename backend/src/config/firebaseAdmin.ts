@@ -10,9 +10,9 @@ function initFirebaseAdmin(): App | undefined { // eslint-disable-line consisten
 
   const key = process.env.FIREBASE_PRIVATE_KEY;
   if (key) {
-    console.log(`[FIREBASE_KEY_CHECK] length=${key.length} startsWith="${key.substring(0, 30).replace(/\n/g, '\\n')}" endsWith="${key.substring(key.length - 30).replace(/\n/g, '\\n')}" hasSlashN=${key.includes('\\n')} hasLF=${key.includes('\n')} hasCR=${key.includes('\r')}`);
+    console.error(`[FIREBASE_KEY_CHECK] length=${key.length} startsWith="${key.substring(0, 30).replace(/\n/g, '\\n')}" endsWith="${key.substring(key.length - 30).replace(/\n/g, '\\n')}" hasSlashN=${key.includes('\\n')} hasLF=${key.includes('\n')} hasCR=${key.includes('\r')}`);
   } else {
-    console.log('[FIREBASE_KEY_CHECK] Key is empty or undefined');
+    console.error('[FIREBASE_KEY_CHECK] Key is empty or undefined');
   }
 
   try {
