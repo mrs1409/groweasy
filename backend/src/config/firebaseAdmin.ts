@@ -24,8 +24,10 @@ function initFirebaseAdmin(): App | undefined { // eslint-disable-line consisten
       logger.info('Initializing Firebase Admin using individual environment variables');
       const formattedPrivateKey = privateKey
         .replace(/\\n/g, '\n')
-        .replace(/\r\n/g, '\n')
-        .replace(/\r/g, '\n');
+        .split(/\r?\n/)
+        .map(line => line.trim())
+        .filter(line => line.length > 0)
+        .join('\n');
 
       return initializeApp({
         credential: cert({
