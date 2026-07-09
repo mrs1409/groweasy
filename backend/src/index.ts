@@ -15,7 +15,7 @@ import { logger } from './utils/logger';
 function startServer(): void {
   const app = createApp();
 
-  const server = app.listen(config.port, () => {
+  const server = app.listen(config.port, '0.0.0.0', () => {
     logger.info(`🚀 GrowEasy CSV Importer Backend running`, {
       port: config.port,
       environment: config.nodeEnv,

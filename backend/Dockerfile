@@ -33,6 +33,7 @@ RUN addgroup -g 1001 -S appgroup && \
 
 USER appuser
 
-EXPOSE 3001
+ENV PORT=8080
+EXPOSE 8080
 
 CMD ["node", "dist/index.js"]
