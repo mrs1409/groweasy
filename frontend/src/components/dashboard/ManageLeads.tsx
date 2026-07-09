@@ -393,6 +393,7 @@ export function ManageLeads({ onOpenImport }: ManageLeadsProps) {
                       <tr 
                         key={virtualRow.key} 
                         ref={importedVirtualizer.measureElement}
+                        data-index={virtualRow.index}
                         onClick={() => setSelectedLead(lead)}
                         className="hover:bg-[hsl(var(--muted)/0.2)] transition-colors duration-150 cursor-pointer"
                       >
@@ -463,6 +464,7 @@ export function ManageLeads({ onOpenImport }: ManageLeadsProps) {
                       <tr 
                         key={virtualRow.key} 
                         ref={skippedVirtualizer.measureElement}
+                        data-index={virtualRow.index}
                         className="hover:bg-[hsl(var(--muted)/0.2)] transition-colors duration-150"
                       >
                         <td className="px-5 py-3.5 font-mono text-[hsl(var(--muted-foreground))] whitespace-nowrap">

@@ -445,6 +445,7 @@ export function ImportCSVView({ onImportComplete }: ImportCSVViewProps) {
                         <tr 
                           key={virtualRow.key} 
                           ref={previewVirtualizer.measureElement}
+                          data-index={virtualRow.index}
                           className="hover:bg-[hsl(var(--muted)/0.15)] transition-colors"
                         >
                           <td className="px-4 py-2.5 font-mono text-[hsl(var(--muted-foreground))]">{virtualRow.index + 1}</td>
@@ -611,6 +612,7 @@ export function ImportCSVView({ onImportComplete }: ImportCSVViewProps) {
                           <tr 
                             key={virtualRow.key} 
                             ref={resultsImportedVirtualizer.measureElement}
+                            data-index={virtualRow.index}
                             className="hover:bg-[hsl(var(--muted)/0.25)] transition-colors"
                           >
                             <td className="px-5 py-3 font-semibold text-[hsl(var(--foreground))]">{lead.name || 'No Name'}</td>
@@ -663,6 +665,7 @@ export function ImportCSVView({ onImportComplete }: ImportCSVViewProps) {
                           <tr 
                             key={virtualRow.key} 
                             ref={resultsSkippedVirtualizer.measureElement}
+                            data-index={virtualRow.index}
                             className="hover:bg-[hsl(var(--muted)/0.25)]"
                           >
                             <td className="px-5 py-3 font-mono text-[hsl(var(--muted-foreground))]">Row #{skip.rowIndex + 1}</td>

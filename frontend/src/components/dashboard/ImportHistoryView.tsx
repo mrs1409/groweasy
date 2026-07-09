@@ -254,6 +254,7 @@ export function ImportHistoryView({ onView, onRetryComplete }: ImportHistoryView
                     <tr 
                       key={virtualRow.key} 
                       ref={historyVirtualizer.measureElement}
+                      data-index={virtualRow.index}
                       className="hover:bg-[hsl(var(--muted)/0.15)] transition-colors"
                     >
                       <td className="px-5 py-3.5 font-mono text-[hsl(var(--muted-foreground))]">
