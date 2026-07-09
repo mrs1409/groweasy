@@ -44,7 +44,22 @@ function initFirebaseAdmin(): App | undefined { // eslint-disable-line consisten
   } catch (error) {
     const errMsg = error instanceof Error ? error.message : String(error);
     const errStack = error instanceof Error ? error.stack : undefined;
-    logger.error('Failed to initialize Firebase Admin SDK', { error: errMsg, stack: errStack });
+    
+    const key = process.env.FIREBASE_PRIVATE_KEY;
+    const keyInfo = {
+      length: key ? key.length : 0,
+      startsWith: key ? key.substring(0, 30) : '',
+      endsWith: key ? key.substring(key.length - 30) : '',
+      hasCR: key ? key.includes('\r') : false,
+      hasLF: key ? key.includes('\n') : false,
+      hasEscapedN: key ? key.includes('\\n') : false,
+    };
+
+    logger.error('Failed to initialize Firebase Admin SDK', { 
+      error: errMsg, 
+      stack: errStack,
+      keyInfo
+    });
     return undefined;
   }
 }
