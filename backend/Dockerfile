@@ -4,7 +4,9 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
+COPY prisma ./prisma/
 RUN npm ci
+RUN npx prisma generate
 
 COPY tsconfig.json ./
 COPY src/ ./src/
@@ -19,7 +21,9 @@ WORKDIR /app
 ENV NODE_ENV=production
 
 COPY package.json package-lock.json* ./
+COPY prisma ./prisma/
 RUN npm ci --omit=dev && npm cache clean --force
+RUN npx prisma generate
 
 COPY --from=builder /app/dist ./dist
 
