@@ -1,8 +1,4 @@
-// ============================================
-// GrowEasy CSV Importer — API Routes
-// ============================================
-
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { upload } from '../middleware/upload';
 import { rateLimiter } from '../middleware/rateLimiter';
 import { authMiddleware } from '../middleware/authMiddleware';
@@ -16,6 +12,7 @@ import {
   deleteImport,
 } from '../controllers/historyController';
 import { getLeads } from '../controllers/leadsController';
+import { prisma } from '../config/prisma';
 
 const router = Router();
 
@@ -26,8 +23,44 @@ const router = Router();
  */
 router.get('/health', handleHealthCheck);
 
+/**
+ * GET /api/debug
+ * Diagnoses production configuration. Shows env var status + DB connectivity.
+ * PUBLIC — no auth required (safe: no secrets exposed).
+ */
+router.get('/debug', async (_req: Request, res: Response) => {
+  let dbStatus = 'unknown';
+  let dbDetail = '';
+  try {
+    const count = await prisma.user.count();
+    dbStatus = 'connected';
+    dbDetail = `${count} users in DB`;
+  } catch (e: any) {
+    dbStatus = 'error';
+    dbDetail = e.message;
+  }
+
+  res.json({
+    env: {
+      NODE_ENV: process.env.NODE_ENV,
+      PORT: process.env.PORT,
+      DATABASE_URL: process.env.DATABASE_URL
+        ? `set (${process.env.DATABASE_URL.substring(0, 30)}...)`
+        : '❌ NOT SET',
+      CORS_ORIGIN: process.env.CORS_ORIGIN || '❌ NOT SET',
+      GEMINI_API_KEY: process.env.GEMINI_API_KEY ? '✅ set' : '❌ NOT SET',
+      FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID ? '✅ set' : '❌ NOT SET',
+      FIREBASE_CLIENT_EMAIL: process.env.FIREBASE_CLIENT_EMAIL ? '✅ set' : '❌ NOT SET',
+      FIREBASE_PRIVATE_KEY: process.env.FIREBASE_PRIVATE_KEY ? '✅ set' : '❌ NOT SET',
+    },
+    database: { status: dbStatus, detail: dbDetail },
+    uptime: process.uptime(),
+  });
+});
+
 // ─── All routes below require Firebase auth ──
 router.use(authMiddleware);
+
 
 // ─── Dashboard ───────────────────────────────
 /**

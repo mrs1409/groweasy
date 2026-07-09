@@ -50,20 +50,23 @@ export async function handleImport(
 
   logger.info('Import request received', { requestId, userId, progressId });
 
-  // Create the Import record immediately — status will be updated on completion/failure
-  let importRecord = await importRepository.create({
-    userId,
-    fileName: req.file?.originalname ?? 'unknown.csv',
-  });
-
-  if (progressId) {
-    progressService.send(progressId, {
-      percentage: 10,
-      stage: 'Uploading CSV',
-    });
-  }
+  // Initialize importRecord outside try so we can reference it in catch
+  let importRecord: { id: number } | null = null;
 
   try {
+    // ─── Step 0: Create Import record in DB ────
+    importRecord = await importRepository.create({
+      userId,
+      fileName: req.file?.originalname ?? 'unknown.csv',
+    });
+
+    if (progressId) {
+      progressService.send(progressId, {
+        percentage: 10,
+        stage: 'Uploading CSV',
+      });
+    }
+
     // ─── Step 1: Validate file presence ────────
     if (!req.file) {
       await importRepository.update(importRecord.id, userId, {
